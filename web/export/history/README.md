@@ -1,27 +1,12 @@
-# Export history
+# Export history (local only)
 
-`out/` is a scratch folder (gitignored). It gets overwritten on every capture.
-
-Meaningful checkpoints go here so stills and videos stay in git with the code.
-
-## Layout
-
-```
-history/
-  YYYY-MM-DD-<label>/
-    still-*.png
-    comasoft-intro-*.mp4
-    …
-```
-
-## Snapshot current `out/`
-
-From `web/export/`:
+`out/` and dated snapshot folders under here are **not** committed.
+Run capture locally, then snapshot if you want a local backup:
 
 ```bash
+cd web/export
+node capture.mjs
 node snapshot.mjs --label=v5-scene04
 ```
 
-Creates `history/YYYY-MM-DD-<label>/` from the current `out/` contents.
-
-Looktests for the v5 experiments live under `web/v5/review/` and are committed with that folder.
+Git tracks code (`web/`, `web/v5/`) and this README only — not mp4/webm/png outputs.

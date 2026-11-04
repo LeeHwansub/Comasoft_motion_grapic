@@ -1,7 +1,5 @@
 .claude
-.trail/*
-!.trail/learnings/
-!.trail/learnings/**
+.trail
 _box
 web/export/node_modules/
 

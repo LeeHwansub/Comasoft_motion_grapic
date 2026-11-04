@@ -26,7 +26,8 @@ body { display: grid; place-items: center; }
 
 #bg { fill: var(--bg); }
 .line, .line line { stroke: var(--line); stroke-width: 2; }
-#net circle { fill: var(--ink); stroke: none; }
+#net circle, #net rect { fill: var(--ink); stroke: none; }
+#net .blue { fill: var(--blue); }
 #dotline { stroke: var(--dot); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 0 30; }
 #ghosts rect { fill: var(--blue); }
 #spark { fill: var(--blue); }

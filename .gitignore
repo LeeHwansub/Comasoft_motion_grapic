@@ -1,6 +1,9 @@
 .claude
-.trail
+.trail/*
+!.trail/learnings/
+!.trail/learnings/**
 _box
 web/export/node_modules/
+# Scratch capture output (overwritten). Keep checkpoints in web/export/history/ instead.
 web/export/out/
 .DS_Store

@@ -1,0 +1,39 @@
+:root {
+  --bg: #f7f9fe;
+  --ink: #0b0d12;
+  --line: rgba(31, 91, 255, .32);
+  --guide: rgba(31, 91, 255, .22);
+  --dot: #1f5bff;
+  --ui: rgba(11, 13, 18, .55);
+}
+:root[data-theme="dark"] {
+  --bg: #0a090a;
+  --ink: #ffffff;
+  --line: rgba(110, 150, 255, .34);
+  --guide: rgba(110, 150, 255, .2);
+  --dot: #3d7bff;
+  --ui: rgba(255, 255, 255, .55);
+}
+
+html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+.intro { position: fixed; inset: 0; }
+#fx, #lines { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+#lines .ln { fill: none; stroke: var(--line); stroke-width: 1.6; }
+#lines .guide { fill: none; stroke: var(--guide); stroke-width: 2; stroke-dasharray: 2 10; stroke-linecap: round; }
+#lines .dot { fill: var(--dot); }
+#lines .ink { fill: var(--ink); }
+
+.review {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+  display: flex; gap: 12px; align-items: center;
+  font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ui);
+  width: min(720px, calc(100% - 32px));
+}
+.review button {
+  font: inherit; color: inherit; background: none; border: 1px solid currentColor;
+  border-radius: 999px; padding: 6px 10px; cursor: pointer; white-space: nowrap;
+}
+.review input { flex: 1; accent-color: #1f5bff; }
+.review output { min-width: 72px; text-align: right; }
+.hide-ui .review { display: none; }

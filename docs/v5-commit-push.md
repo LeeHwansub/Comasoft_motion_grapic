@@ -90,7 +90,28 @@ git status -sb
 git log --oneline origin/feature/intro-motion-v5 -3
 ```
 
-PR은 별도 승인 후에만 만든다. 대상 브랜치는 보통 `dev`.
+## 7.1 PR (대상 `dev`)
+
+원격에 `dev`가 없으면 먼저 올린다:
+
+```bash
+git push -u origin dev
+```
+
+PR 생성 (CLI):
+
+```bash
+gh pr create --base dev --head feature/intro-motion-v5 \
+  --title "COMASOFT intro v5 모션과 export 히스토리 체크포인트" \
+  --body-file -   # 또는 웹에서 작성
+```
+
+웹에서 바로 만들기:
+
+https://github.com/LeeHwansub/Comasoft_motion_grapic/compare/dev...feature/intro-motion-v5?expand=1
+
+`gh`가 `Forbidden` / 토큰 오류면 `gh auth refresh -h github.com` 후 다시 시도한다.  
+병합은 PR 생성과 별도 승인.
 
 ## 8. 다음에 이어서 할 때
 

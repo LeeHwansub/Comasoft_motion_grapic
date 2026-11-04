@@ -23,6 +23,15 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
 #lines .guide { fill: none; stroke: var(--guide); stroke-width: 2; stroke-dasharray: 2 10; stroke-linecap: round; }
 #lines .dot { fill: var(--dot); }
 #lines .ink { fill: var(--ink); }
+#lines .hollow { fill: none; stroke: var(--dot); stroke-width: 3; }
+
+#lines .logo path { fill: none; stroke: var(--ink); stroke-width: 19; stroke-linejoin: miter; stroke-miterlimit: 10; }
+#lines .logo-sweep path { stroke: url(#sweep); }
+#lines .slogan {
+  font: 600 19px/1 "Pretendard", "Inter", "Helvetica Neue", Arial, sans-serif;
+  fill: var(--ink);
+}
+:root[data-theme="dark"] #lines .logo { filter: drop-shadow(0 0 18px rgba(80, 130, 255, .35)); }
 
 .review {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);

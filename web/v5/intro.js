@@ -1,18 +1,18 @@
-// COMASOFT intro v5 — 룩 테스트 (03 MEET → 04 TRANSFORM → 05 COMASOFT, 2.0s ~ 5.0s)
+// COMASOFT intro v5 — 룩 테스트 (01 IDEA → 02 AI → 03 MEET → 04 TRANSFORM → 05 COMASOFT, 0 ~ 5.0s)
 // 04: 원과 사각형이 태극처럼 휘감기며 경계 없는 하나의 원이 되고(네트워크가 원을 엮어 냄),
 //     옅어지며 입자로 좌우로 흩어져 05 로 이어진다.
 // 05: 흩어진 입자가 왼쪽 아래 원 · 오른쪽 아래 사각형으로 흘러들어 도형이 되고, 로고와 슬로건이 나타나며 멈춘다.
 // render(t) 는 시간 t(초)만으로 화면을 결정한다 → 실시간 재생과 프레임 캡처가 같은 결과.
 //   ?t=3.4          고정 프레임
 //   ?theme=dark     다크 테마
-//   ?from=2&to=5.4  반복 재생 구간 (5.0 이후는 최종 정지 화면)
+//   ?from=0&to=5.4  반복 재생 구간 (5.0 이후는 최종 정지 화면)
 (() => {
   const W = 1920, H = 1080;
   const q = new URLSearchParams(location.search);
   const root = document.documentElement;
   const setTheme = name => { root.dataset.theme = name; };
   setTheme(q.get('theme') === 'dark' ? 'dark' : 'light');
-  const FROM = parseFloat(q.get('from') ?? '2'), TO = parseFloat(q.get('to') ?? '5.4');
+  const FROM = parseFloat(q.get('from') ?? '0'), TO = parseFloat(q.get('to') ?? '5.4');
   const isDark = () => root.dataset.theme === 'dark';
 
   // ---------------------------------------------------------------- 색
@@ -24,6 +24,8 @@
       circle: ['#8ab0fd', '#4784fb', '#0a56fc'],
       rect: ['#0956fd', '#1d63fd', '#5a8ffe'],
       navy: ['#011a7f', '#022692'],
+      rectPale: ['#dbe6fe', '#b1c8fd', '#8eb0fd'], ghost: '#7ba6fe',
+      soft1: ['rgba(214,227,254,0)', 'rgba(170,198,253,.75)', 'rgba(128,166,252,.95)'], arc1: '#4f7dff',
       // 태극 위쪽(원에서 온 쪽): 머리가 짙고 꼬리로 갈수록 밝아짐
       yang: ['#0038e6', '#0a56fc', '#4f88fb', '#a9c4fc'],
       // 태극 아래쪽(사각형에서 온 쪽): 원뿔 그라데이션으로 휘감기는 밝은 면
@@ -44,6 +46,8 @@
       circle: ['#0a2a8f', '#0843cf', '#2a6bff'],
       rect: ['#1f5bff', '#1747d8', '#0d2a85'],
       navy: ['#01061f', '#020b33'],
+      rectPale: ['#0c1a4c', '#122d80', '#1a3fae'], ghost: '#1d4fd6',
+      soft1: ['rgba(12,30,100,0)', 'rgba(18,44,140,.7)', 'rgba(26,62,190,.9)'], arc1: 'rgba(170,195,255,.8)',
       yang: ['#5a8dff', '#3d7bff', '#1d55f0', '#11318f'],
       yin: [[0, '#070f2e'], [.2, '#0a1a50'], [.42, '#112c82'], [.6, '#1842b8'], [.78, '#0c2268'], [1, '#070f2e']],
       crease: '#7aa3ff', rim: 'rgba(150,185,255,',
@@ -82,16 +86,30 @@
   // ---------------------------------------------------------------- 타임라인 (1920x1080)
   // 03  2.00 요소 이동 → 2.30 교차·결합 → 2.70 형태 확장 → 3.00 안정화
   // 04  3.00 휘감기 시작 → 3.55 하나의 원(태극) → 3.90 회전하며 머묾 → 4.0~4.8 옅어지며 흩어짐
+  // 01  0.00 배경 대기 → 0.25 점 이동 → 0.50 원형 등장 → 1.00 확대 및 정지
+  // 02  1.00 사각형 등장 → 1.30 회전 및 이동 → 1.60 블루 컬러 강조 → 2.00 정렬 및 전환
   const T = {
-    cx:  [[1.8, 520], [2.0, 600], [2.3, 690], [2.7, 753, 'expo'], [3.0, 760]],
-    cy:  [[1.8, 546]],
-    r:   [[1.8, 150], [2.0, 165], [2.3, 215], [2.7, 300, 'expo'], [3.0, 287]],
-    cA:  [[1.8, 0], [2.0, .55, 'out'], [2.4, 1, 'out']],
-    rx:  [[1.8, 1560], [2.0, 1380], [2.3, 1130], [2.7, 1143, 'expo'], [3.0, 1143]],
-    ry:  [[1.8, 540]],
-    rw:  [[1.8, 260], [2.0, 290], [2.3, 380], [2.7, 520, 'expo'], [3.0, 503]],
-    rh:  [[1.8, 230], [2.0, 250], [2.3, 330], [2.7, 470, 'expo'], [3.0, 456]],
-    rA:  [[1.8, 0], [2.0, .45, 'out'], [2.4, 1, 'out']],
+    // 원: 점으로 태어나 왼쪽으로 이동 → 원으로 커짐 → 02 동안 선 위의 점으로 작아짐 → 03 에서 다시 커짐
+    cx:  [[0, 960], [.18, 960], [.52, 431, 'expo'], [1.0, 431], [1.28, 330], [1.75, 330], [2.0, 600], [2.3, 690], [2.7, 753, 'expo'], [3.0, 760]],
+    cy:  [[0, 546]],
+    r:   [[0, 0], [.14, 11, 'back'], [.36, 12], [.66, 77, 'back'], [1.0, 77], [1.28, 9], [1.75, 9], [2.0, 165, 'expo'], [2.3, 215], [2.7, 300, 'expo'], [3.0, 287]],
+    cA:  [[0, 1], [1.78, 1], [2.0, .6], [2.4, 1, 'out']],
+    // 사각형: 같은 크기로 왼쪽에서 미끄러져 들어와 감속하며 멈춤(잔상이 따라옴) → 03 으로 이어짐
+    rx:  [[1.0, 260], [1.85, 1290, 'out'], [2.0, 1290], [2.3, 1130], [2.7, 1143, 'expo'], [3.0, 1143]],
+    ry:  [[0, 540]],
+    rw:  [[1.0, 340], [2.0, 340], [2.3, 380], [2.7, 520, 'expo'], [3.0, 503]],
+    rh:  [[1.0, 340], [2.0, 340], [2.3, 330], [2.7, 470, 'expo'], [3.0, 456]],
+    rA:  [[.98, 0], [1.08, 1, 'out']],
+    rRot:[[0, 0]],
+    rSat:[[1.25, 0], [1.62, 1, 'out']],                     // 1.60 블루 컬러 강조 (한 방향으로만)
+    trail:[[1.0, 0], [1.1, 1], [1.85, 1], [2.25, 0]],       // 잔상
+    // 01 오른쪽 큰 옅은 원
+    s1:  [[.38, 0], [.9, 1, 'out'], [1.08, 1], [1.4, 0]],
+    s1r: [[.38, 400], [1.05, 563, 'out']],
+    l1draw: [[.05, 0], [.95, 1, 'out']],
+    l1o:  [[0, 1], [1.02, 1], [1.3, 0]],
+    l2draw: [[1.0, 0], [1.55, 1, 'out']],
+    l2o:  [[1.0, 1], [1.85, 1], [2.05, 0]],
     ov:  [[2.12, 0], [2.45, 1, 'out'], [3.05, 1], [3.3, 0]],
     // 04
     m:     [[3.0, 0], [3.6, 1, 'quint']],                  // 두 도형이 휘감기며 한 원으로
@@ -120,8 +138,9 @@
   };
   const TC = [960, 543], TR = 318;                         // 하나가 된 원의 중심 / 반지름
 
+  const D2R = Math.PI / 180;
   const state = t => {
-    const s = {};
+    const s = { t };
     for (const k in T) s[k] = at(T[k], t);
     return s;
   };
@@ -291,9 +310,28 @@
   // ---------------------------------------------------------------- 형태
   function draw03(c, s, p) {
     const { cx, cy, r } = s, b = { x: s.rx - s.rw / 2, y: s.ry - s.rh / 2, w: s.rw, h: s.rh };
-    let g = c.createLinearGradient(b.x, 0, b.x + b.w, 0);
-    g.addColorStop(0, p.rect[0]); g.addColorStop(.6, p.rect[1]); g.addColorStop(1, p.rect[2]);
-    c.globalAlpha = s.rA; c.fillStyle = g; c.fillRect(b.x, b.y, b.w, b.h);
+    let g;
+    if (s.rA > 0) {
+      // 02 잔상: 지나온 자리에 옅은 사각형이 겹겹이 남음 (멈추면 사각형 뒤로 정렬되며 사라짐)
+      if (s.trail > 0) {
+        for (let k = 4; k >= 1; k--) {
+          const q = state(s.t - .07 * k), w = q.rw, h = q.rh;
+          c.save(); c.translate(q.rx, q.ry); c.rotate(q.rRot * D2R);
+          c.globalAlpha = s.trail * (.34 - .07 * (k - 1)); c.fillStyle = p.ghost; c.fillRect(-w / 2, -h / 2, w, h);
+          c.restore();
+        }
+      }
+      c.save(); c.translate(s.rx, s.ry); c.rotate(s.rRot * D2R); c.translate(-s.rx, -s.ry);
+      if (s.rSat < 1) {
+        g = c.createLinearGradient(b.x, b.y, b.x + b.w, b.y + b.h);
+        g.addColorStop(0, p.rectPale[0]); g.addColorStop(.6, p.rectPale[1]); g.addColorStop(1, p.rectPale[2]);
+        c.globalAlpha = s.rA * (1 - s.rSat); c.fillStyle = g; c.fillRect(b.x, b.y, b.w, b.h);
+      }
+      g = c.createLinearGradient(b.x, 0, b.x + b.w, 0);
+      g.addColorStop(0, p.rect[0]); g.addColorStop(.6, p.rect[1]); g.addColorStop(1, p.rect[2]);
+      c.globalAlpha = s.rA * s.rSat; c.fillStyle = g; c.fillRect(b.x, b.y, b.w, b.h);
+      c.restore();
+    }
     g = c.createLinearGradient(cx - .72 * r, cy + .72 * r, cx + .72 * r, cy - .72 * r);
     g.addColorStop(0, p.circle[0]); g.addColorStop(.5, p.circle[1]); g.addColorStop(1, p.circle[2]);
     c.globalAlpha = s.cA; c.fillStyle = g; c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
@@ -549,6 +587,14 @@
     blob(1720, 1120, 620, .85);          // 오른쪽 아래 연한 빛 면
     blob(1880, 40, 520, .45);            // 오른쪽 위
     blob(80, 980, 520, .3);              // 왼쪽 아래
+    // 01 오른쪽 큰 옅은 원 (원형 등장 → 확대 및 정지)
+    if (s.s1 > 0) {
+      const x = 1773, y = 394, r = s.s1r;
+      const g = c.createLinearGradient(x - r, 0, x + r * .6, 0);
+      g.addColorStop(0, p.soft1[0]); g.addColorStop(.55, p.soft1[1]); g.addColorStop(1, p.soft1[2]);
+      c.globalAlpha = s.s1; c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+      c.globalAlpha = 1;
+    }
     // 구 아래 바닥 그림자
     if (s.unify > 0 && s.fade > 0) {
       const R = TR * s.grow, front = clamp(erodeFront(s));
@@ -583,6 +629,24 @@
     parent.appendChild(el); return el;
   };
   const group = () => mk('g', svg, {});
+  // 01 IDEA (COMASOFT4 패널 01 좌표 → 1920x1080)
+  const G1 = group();
+  const L1 = {
+    guides: ['M0,546 H1920', 'M96,0 V1080', 'M1577,0 V1080'],
+    paths: ['M717,0 C770,330 1050,560 1577,546', 'M1139,652 Q1185,830 1370,1000'],
+    dots: [[96, 546, 6], [1577, 546, 7], [1139, 652, 8],
+           ...Array.from({ length: 22 }, (_, i) => [560 + i * 52, 546, i % 3 === 0 ? 3.6 : 2.6])],
+    sqs: [],
+  };
+  // 02 AI (COMASOFT4 패널 02 좌표 → 1920x1080)
+  const G2 = group();
+  const L2 = {
+    guides: ['M1514,0 V1080', 'M698,430 V640', 'M380,500 V650'],
+    paths: [],
+    dots: [[62, 546, 3.5], [164, 546, 3.5], [484, 546, 3], [698, 546, 3], [920, 546, 3], [1013, 546, 3]],
+    sqs: [[270, 546, 12], [380, 546, 10], [591, 546, 26]],
+    hollows: [[1745, 546, 30]],
+  };
   // 03 MEET (COMASOFT4 패널 03 좌표 → 1920x1080)
   const G3 = group();
   const L3 = {
@@ -607,9 +671,10 @@
     paths: d.paths.map(dd => mk('path', g, { d: dd, class: 'ln', pathLength: 1, 'stroke-dasharray': '1 1' })),
     dots: d.dots.map(([x, y, r]) => mk('circle', g, { cx: x, cy: y, r, class: 'dot', 'data-r': r })),
     sqs: [...d.sqs.map(([x, y, z]) => mk('rect', g, { x: x - z / 2, y: y - z / 2, width: z, height: z, class: 'dot' })),
-          ...(d.inks || []).map(([x, y, z]) => mk('rect', g, { x: x - z / 2, y: y - z / 2, width: z, height: z, class: 'ink' }))],
+          ...(d.inks || []).map(([x, y, z]) => mk('rect', g, { x: x - z / 2, y: y - z / 2, width: z, height: z, class: 'ink' })),
+          ...(d.hollows || []).map(([x, y, z]) => mk('rect', g, { x: x - z / 2, y: y - z / 2, width: z, height: z, class: 'hollow' }))],
   });
-  const S3 = build(G3, L3), S4 = build(G4, L4);
+  const S1 = build(G1, L1), S2 = build(G2, L2), S3 = build(G3, L3), S4 = build(G4, L4);
   // 05 로고: logo-comasoft.svg 와 같은 글자 패스 (캡 높이 100 기준)
   const LOGO_LETTERS = [[0.0, "M112,9.5 H42.5 A33,33 0 0 0 9.5,42.5 V57.5 A33,33 0 0 0 42.5,90.5 H112"], [128.0, "M42.5,9.5 H79.5 A33,33 0 0 1 112.5,42.5 V57.5 A33,33 0 0 1 79.5,90.5 H42.5 A33,33 0 0 1 9.5,57.5 V42.5 A33,33 0 0 1 42.5,9.5 Z"], [266.0, "M9.5,120 V9.5 L63.0,86.0 L116.5,9.5 V120"], [408.0, "M6,120 L64.0,-30 L122,120 M27.400000000000002,70.0 H100.6"], [552.0, "M108,9.5 H29.75 A20.25,20.25 0 0 0 9.5,29.75 V29.75 A20.25,20.25 0 0 0 29.75,50 H78.25 A20.25,20.25 0 0 1 98.5,70.25 V70.25 A20.25,20.25 0 0 1 78.25,90.5 H0"], [676.0, "M42.5,9.5 H79.5 A33,33 0 0 1 112.5,42.5 V57.5 A33,33 0 0 1 79.5,90.5 H42.5 A33,33 0 0 1 9.5,57.5 V42.5 A33,33 0 0 1 42.5,9.5 Z"], [814.0, "M9.5,120 V9.5 H94 M9.5,52 H80"], [924.0, "M0,9.5 H100 M50.0,9.5 V120"]];
   const LOGO_W = 1024, LS = LOGO5.w / LOGO_W;
@@ -643,7 +708,7 @@
     g.setAttribute('opacity', o.toFixed(3));
     S.paths.forEach((p, i) => p.setAttribute('stroke-dashoffset', 1 - clamp(draw * 1.25 - i * .06)));
     S.guides.forEach(p => p.setAttribute('opacity', draw.toFixed(3)));
-    S.dots.forEach((d, i) => d.setAttribute('r', (+d.dataset.r * E.back(clamp(draw * 1.6 - .3 - i * .05))).toFixed(2)));
+    S.dots.forEach((d, i) => d.setAttribute('r', (+d.dataset.r * E.back(clamp(draw * 1.6 - .3 - i * Math.min(.05, .9 / S.dots.length)))).toFixed(2)));
     S.sqs.forEach(r => r.setAttribute('opacity', clamp(draw * 2 - .6).toFixed(3)));
   };
 
@@ -664,6 +729,8 @@
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     ctx.drawImage(L.form.c, 0, 0);
     toDesign(ctx); draw05(ctx, s, p); drawParticles(ctx, s, p); drawNet(ctx, s, p);
+    drawLines(S1, G1, s.l1draw, s.l1o);
+    drawLines(S2, G2, s.l2draw, s.l2o);
     drawLines(S3, G3, s.l3draw, s.l3o);
     drawLines(S4, G4, s.l4draw, s.l4o);
     drawLogo(s);

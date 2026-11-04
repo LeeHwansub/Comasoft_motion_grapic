@@ -7,6 +7,9 @@
   --blue-deep: #0a3fe0;
   --blue-mid: #8fb0ff;
   --blue-light: #e3ebff;
+  --blue-soft: #7fa2ff;
+  --navy: #0b2a9e;
+  --navy-deep: #061566;
 }
 :root[data-theme="dark"] {
   --bg: #07080c;
@@ -26,9 +29,6 @@ body { display: grid; place-items: center; }
 #net circle { fill: var(--ink); stroke: none; }
 #dotline { stroke: var(--dot); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 0 30; }
 #ghosts rect { fill: var(--blue); }
-#actors { isolation: isolate; }
-#square { mix-blend-mode: multiply; }
-:root[data-theme="dark"] #square { mix-blend-mode: screen; }
 #spark { fill: var(--blue); }
 #logo {
   font-family: "Montserrat", "Arial Black", sans-serif;

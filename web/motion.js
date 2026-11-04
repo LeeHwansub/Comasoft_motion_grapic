@@ -34,18 +34,21 @@
       r:  [[0, 0], [0.45, 30, 'back'], [1, 30], [1.4, 10], [2, 10], [2.6, 290, 'expo'], [3, 290], [3.8, 250], [4.05, 250], [4.75, 520]],
     },
     square: {
-      x:  [[1, 260], [1.75, 1290, 'expo'], [2, 1290], [2.6, 1110, 'expo'], [3, 1100], [3.8, 1010], [4.05, 1010], [4.75, 1790]],
+      x:  [[1, 260], [1.85, 1290, 'out'], [2, 1290], [2.6, 1110, 'expo'], [3, 1100], [3.8, 1010], [4.05, 1010], [4.75, 1790]],
       y:  [[0, 540], [4.05, 540], [4.75, 1010]],
       s:  [[0, 340], [3, 340], [3.8, 320], [4.05, 320], [4.75, 420]],
       rx: [[0, 0], [3, 0], [3.7, 70], [4.05, 70], [4.75, 48]],
       rot:[[0, 0], [3, 0], [3.7, -10], [4.05, -10], [4.75, 0]],
       o:  [[0.98, 0], [1.08, 1], [4.05, 1], [4.75, 0.22]],
     },
+    // 01 오른쪽 그라데이션 원 → 05 오른쪽 위 연한 원으로 재등장
     soft: {
-      cx: [[0, 1780], [0.8, 1600, 'out'], [1.4, 1820]],
-      r:  [[0, 430]],
-      o:  [[0, 0], [0.7, 1], [1.05, 1], [1.4, 0]],
+      cx: [[0, 1780], [0.8, 1600, 'out'], [1.4, 1820], [4.2, 1820], [4.8, 1760, 'out']],
+      cy: [[0, 470], [4.2, 470], [4.21, 90], [4.8, 110, 'out']],
+      r:  [[0, 430], [4.2, 430], [4.21, 320]],
+      o:  [[0, 0], [0.7, 1], [1.05, 1], [1.4, 0], [4.2, 0], [4.8, 0.85]],
     },
+    overlap: { o: [[2.2, 0], [2.5, 1], [4.05, 1], [4.3, 0]] },
     orbit: {
       cx: [[0, 960], [4.05, 960], [4.75, 1900]],
       cy: [[0, 540], [4.05, 540], [4.75, -80]],
@@ -97,22 +100,25 @@
     });
 
     set($('dotline'), { opacity: at(T.dotline.o, t), 'stroke-dashoffset': at(T.dotline.drift, t) });
-    set($('soft'), { cx: at(T.soft.cx, t), cy: 470, r: at(T.soft.r, t), opacity: at(T.soft.o, t) });
+    set($('soft'), { cx: at(T.soft.cx, t), cy: at(T.soft.cy, t), r: at(T.soft.r, t), opacity: at(T.soft.o, t) });
 
     const c = T.circle;
-    set($('circle'), { cx: at(c.cx, t), cy: at(c.cy, t), r: at(c.r, t) });
+    const circ = { cx: at(c.cx, t), cy: at(c.cy, t), r: at(c.r, t) };
+    set($('circle'), circ);
 
     const sq = squareAt(t), rot = at(T.square.rot, t), rx = at(T.square.rx, t);
-    set($('square'), {
-      x: sq.x, y: sq.y, width: sq.width, height: sq.height, rx,
-      opacity: at(T.square.o, t), transform: `rotate(${rot} ${sq.cx} ${sq.cy})`,
-    });
+    const sqAttrs = { x: sq.x, y: sq.y, width: sq.width, height: sq.height, rx, transform: `rotate(${rot} ${sq.cx} ${sq.cy})` };
+    set($('square'), { ...sqAttrs, opacity: at(T.square.o, t) });
+
+    // scene 03~04 겹침 영역: 사각형으로 잘라낸 원을 남색으로
+    set($('squareClip'), sqAttrs);
+    set($('overlap'), { ...circ, opacity: at(T.overlap.o, t) });
 
     // scene 02 잔상: 과거 시점의 위치를 따라감
-    const trail = at([[1, 0], [1.1, 1], [1.9, 1], [2.3, 0]], t);
+    const trail = at([[1, 0], [1.1, 1], [1.85, 1], [2.25, 0]], t);
     ghosts.forEach((g, i) => {
-      const p = squareAt(t - 0.05 * (i + 1));
-      set(g, { x: p.x, y: p.y, width: p.width, height: p.height, opacity: trail * (0.28 - i * 0.06) });
+      const p = squareAt(t - 0.07 * (i + 1));
+      set(g, { x: p.x, y: p.y, width: p.width, height: p.height, opacity: trail * (0.34 - i * 0.07) });
     });
 
     const nd = at(T.net.draw, t), no = at(T.net.o, t);

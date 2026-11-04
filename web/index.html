@@ -12,14 +12,21 @@
 <body>
 <svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="COMASOFT intro motion">
   <defs>
-    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="0.6">
       <stop offset="0" stop-color="var(--blue-deep)"/>
-      <stop offset="1" stop-color="var(--blue)"/>
+      <stop offset=".55" stop-color="var(--blue)"/>
+      <stop offset="1" stop-color="var(--blue-soft)"/>
     </linearGradient>
     <linearGradient id="gSquare" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="var(--blue)"/>
+      <stop offset="0" stop-color="var(--blue-soft)"/>
+      <stop offset=".45" stop-color="var(--blue)"/>
       <stop offset="1" stop-color="var(--blue-deep)"/>
     </linearGradient>
+    <linearGradient id="gNavy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--navy)"/>
+      <stop offset="1" stop-color="var(--navy-deep)"/>
+    </linearGradient>
+    <clipPath id="clipSq"><rect id="squareClip"/></clipPath>
     <linearGradient id="gSoft" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="var(--blue-light)" stop-opacity="0"/>
       <stop offset="1" stop-color="var(--blue-mid)" stop-opacity=".9"/>
@@ -38,6 +45,7 @@
   <g id="actors">
     <circle id="circle" fill="url(#gBlue)"/>
     <rect id="square" fill="url(#gSquare)"/>
+    <circle id="overlap" fill="url(#gNavy)" clip-path="url(#clipSq)"/>
   </g>
 
   <circle id="spark"/>

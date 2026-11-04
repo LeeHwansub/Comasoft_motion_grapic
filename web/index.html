@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMASOFT Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=block" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" aria-label="COMASOFT intro motion">
+  <defs>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0" stop-color="var(--blue-deep)"/>
+      <stop offset=".55" stop-color="var(--blue)"/>
+      <stop offset="1" stop-color="var(--blue-soft)"/>
+    </linearGradient>
+    <linearGradient id="gSquare" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="var(--blue-soft)"/>
+      <stop offset=".45" stop-color="var(--blue)"/>
+      <stop offset="1" stop-color="var(--blue-deep)"/>
+    </linearGradient>
+    <linearGradient id="gNavy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--navy)"/>
+      <stop offset="1" stop-color="var(--navy-deep)"/>
+    </linearGradient>
+    <clipPath id="clipSq"><rect id="squareClip"/></clipPath>
+    <!-- scene 04 융합: 사각형은 왼쪽 위가 짙고 오른쪽 아래로 밝아짐, 접힘면은 밝은 면 -->
+    <linearGradient id="g4Body" x1="0" y1="0.4" x2="1" y2="0.5">
+      <stop offset="0" stop-color="var(--blue-light)"/>
+      <stop offset=".5" stop-color="var(--blue-soft)"/>
+      <stop offset=".8" stop-color="var(--blue)"/>
+      <stop offset="1" stop-color="var(--blue-deep)"/>
+    </linearGradient>
+    <linearGradient id="g4Square" x1="0.2" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="var(--blue-deep)"/>
+      <stop offset=".3" stop-color="var(--blue)"/>
+      <stop offset=".65" stop-color="var(--blue-soft)"/>
+      <stop offset="1" stop-color="var(--blue-light)"/>
+    </linearGradient>
+    <linearGradient id="gFold" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="var(--blue-soft)"/>
+      <stop offset=".5" stop-color="var(--blue-light)"/>
+      <stop offset="1" stop-color="var(--bg)"/>
+    </linearGradient>
+    <linearGradient id="gSoft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="var(--blue-light)" stop-opacity="0"/>
+      <stop offset="1" stop-color="var(--blue-mid)" stop-opacity=".9"/>
+    </linearGradient>
+  </defs>
+
+  <rect id="bg" width="1920" height="1080"/>
+
+  <circle id="orbit" class="line" fill="none"/>
+  <line id="dotline" x1="0" y1="540" x2="1920" y2="540"/>
+  <circle id="soft" fill="url(#gSoft)"/>
+
+  <g id="net" class="line" fill="none"></g>
+
+  <g id="ghosts"></g>
+  <g id="actors">
+    <circle id="circle" fill="url(#gBlue)"/>
+    <rect id="square" fill="url(#gSquare)"/>
+    <circle id="overlap" fill="url(#gNavy)" clip-path="url(#clipSq)"/>
+    <!-- scene 04 융합 형태: 직사각형 + 접힘면 + 원/돌출부 몸체 -->
+    <g id="fused">
+      <rect id="square4" fill="url(#g4Square)"/>
+      <path id="fold" fill="url(#gFold)"/>
+      <path id="body" fill="url(#g4Body)"/>
+    </g>
+  </g>
+
+  <circle id="spark"/>
+  <text id="logo" x="960" y="540" text-anchor="middle" dominant-baseline="central">COMASOFT</text>
+</svg>
+<script src="motion.js"></script>
+</body>
+</html>

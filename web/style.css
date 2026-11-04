@@ -1,0 +1,39 @@
+:root {
+  --bg: #ffffff;
+  --ink: #0b0d12;
+  --line: #c9d5f2;
+  --dot: #9fb3e6;
+  --blue: #1f5bff;
+  --blue-deep: #0a3fe0;
+  --blue-mid: #8fb0ff;
+  --blue-light: #e3ebff;
+  --blue-soft: #7fa2ff;
+  --navy: #0b2a9e;
+  --navy-deep: #061566;
+}
+:root[data-theme="dark"] {
+  --bg: #07080c;
+  --ink: #ffffff;
+  --line: #2a3352;
+  --dot: #3a4c80;
+  --blue-light: #0b1430;
+  --blue-mid: #2c56d6;
+}
+
+html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+body { display: grid; place-items: center; }
+#stage { width: 100vw; height: 100vh; display: block; }
+
+#bg { fill: var(--bg); }
+.line, .line line { stroke: var(--line); stroke-width: 2; }
+#net circle, #net rect { fill: var(--ink); stroke: none; }
+#net .blue { fill: var(--blue); }
+#dotline { stroke: var(--dot); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 0 30; }
+#ghosts rect { fill: var(--blue); }
+#spark { fill: var(--blue); }
+#logo {
+  font-family: "Montserrat", "Arial Black", sans-serif;
+  font-weight: 800;
+  font-size: 150px;
+  fill: var(--ink);
+}

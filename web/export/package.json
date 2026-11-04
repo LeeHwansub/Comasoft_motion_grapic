@@ -1,0 +1,13 @@
+{
+  "name": "comasoft-intro-export",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "export": "node capture.mjs",
+    "export:dark": "node capture.mjs --theme=dark",
+    "still": "node capture.mjs --still"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

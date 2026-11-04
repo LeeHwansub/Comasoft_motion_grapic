@@ -4,6 +4,13 @@
 !.trail/learnings/**
 _box
 web/export/node_modules/
-# Scratch capture output (overwritten). Keep checkpoints in web/export/history/ instead.
+
+# Capture / review binaries stay local — not in git
 web/export/out/
+web/export/history/**
+!web/export/history/README.md
+web/v5/review/
+*.mp4
+*.webm
+
 .DS_Store

@@ -3,3 +3,4 @@
 _box
 web/export/node_modules/
 web/export/out/
+.DS_Store

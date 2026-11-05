@@ -25,8 +25,10 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
 #lines .ink { fill: var(--ink); }
 #lines .hollow { fill: none; stroke: var(--dot); stroke-width: 3; }
 
-#lines .logo path { fill: none; stroke: var(--ink); stroke-width: 19; stroke-linejoin: miter; stroke-miterlimit: 10; }
-#lines .logo-sweep path { stroke: url(#sweep); }
+/* 로고: 라이트는 SVG 원본 그대로, 다크는 같은 모양을 --ink 색으로 */
+#lines .logo-ink { fill: var(--ink); display: none; }
+:root[data-theme="dark"] #lines .logo-img { display: none; }
+:root[data-theme="dark"] #lines .logo-ink { display: inline; }
 #lines .slogan {
   font: 600 19px/1 "Pretendard", "Inter", "Helvetica Neue", Arial, sans-serif;
   fill: var(--ink);
@@ -53,6 +55,14 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
 }
 .skip.done { opacity: 0; pointer-events: none; }
 .hide-ui .ui { display: none; }
+
+/* PC: Skip 이 잘 보이도록 크게 · 진하게 */
+@media (min-width: 769px) {
+  .skip {
+    font-size: 15px; padding: 14px 34px; bottom: 40px;
+    color: var(--ink); border-width: 1.5px;
+  }
+}
 
 /* 모바일: Light/Dark·Skip 버튼만 살짝 축소 (모션 구도는 그대로) */
 @media (max-width: 768px) {

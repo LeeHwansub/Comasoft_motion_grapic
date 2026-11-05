@@ -108,8 +108,8 @@
       TC: [960, 543], TR: 318,
       C5: { x: 205, y: 1066, r: 422 }, R5: { x: 1404, y: 793, w: 600, h: 330, rx: 34 },
       ARC5: { x: 1856, y: -41, r: 495 }, DOT5: { x: 122, y: 321, r: 14 },
-      LOGO5: { x: 472, y: 494, w: 976 },                     // 로고 왼쪽 위 / 너비 (캡 높이 ≈ 95)
-      slogan: { x: 960, y: 650, size: 19, ls: [14, 8] },     // ls: 등장 전 → 정지 시 자간
+      LOGO5: { cx: 960, cy: 541 },                           // 로고 전체의 가로 중심 / (글자 윗변 ~ 슬로건) 덩어리의 세로 중심. 크기는 content.js
+      slogan: { gap: 80, size: 30, ls: [10, 5] },            // gap: 글자 아랫변 → 슬로건 기준선, ls: 등장 전 → 정지 시 자간
       blobs: [[1720, 1120, 620, .85], [1880, 40, 520, .45], [80, 980, 520, .3]],   // 배경 연한 빛 면
       flare: [960, 541], flareR: [700, 300], bloomR: [520, 260],
       lines: [
@@ -164,8 +164,9 @@
     TC: [540, 900], TR: 300,
     C5: { x: 150, y: 1780, r: 400 }, R5: { x: 690, y: 1560, w: 520, h: 400, rx: 34 },
     ARC5: { x: 1040, y: -20, r: 420 }, DOT5: { x: 140, y: 470, r: 14 },
-    LOGO5: { x: 160, y: 863, w: 760 },
-    slogan: { x: 540, y: 1002, size: 24, ls: [14, 8] },
+    LOGO5: { cx: 540, cy: 900 },
+    // 세로: 슬로건이 로고 폭의 ~90%쯤 되게(가로 구도의 자간 비율보다 약간 타이트)
+    slogan: { gap: 90, size: 40, ls: [10, 5] },
     blobs: [[960, 1950, 600, .85], [1060, 60, 480, .45], [60, 1500, 480, .3]],
     flare: [540, 900], flareR: [600, 260], bloomR: [460, 230],
     lines: [
@@ -201,7 +202,7 @@
     ],
   };
 
-  function buildScene(LY) {
+  function buildScene(LY, key) {
     const { W, H } = LY;
     // ---------------------------------------------------------------- 타임라인 (좌표 트랙은 LY.tracks)
     // 03  2.00 요소 이동 → 2.30 교차·결합 → 2.70 형태 확장 → 3.00 안정화
@@ -750,29 +751,34 @@
     });
     const S1 = build(G1, L1), S2 = build(G2, L2), S3 = build(G3, L3), S4 = build(G4, L4);
     // 05 로고 · 슬로건: 내용은 content.js (INTRO_CONTENT)
-    const LOGO_LETTERS = CONTENT.logo.letters, LOGO_W = CONTENT.logo.width, LS = LOGO5.w / LOGO_W;
-    const GL = mk('g', svg, { class: 'logo', transform: `translate(${LOGO5.x} ${LOGO5.y}) scale(${LS})` });
-    mk('rect', mk('clipPath', GL, { id: 'logoCap' }), { x: -40, y: 0, width: 240, height: 100 });
-    const letterEls = LOGO_LETTERS.map(([x, d]) => mk('path', GL, { d, 'data-x': x, 'clip-path': 'url(#logoCap)' }));
+    // 로고는 SVG 파일을 그대로 그린다(라이트). 다크에서는 같은 모양을 마스크로 써서 --ink 색으로 칠한다.
+    // 마크가 붙은 로고: 슬로건은 글자(wordmark) 가운데에, (글자 윗변 ~ 슬로건 기준선) 덩어리는 LOGO5.cy 에 맞춤
+    const [NW, NH] = logoSize, LW = CONTENT.logo.width[key], LK = LW / NW, LH = NH * LK;
+    const WM = CONTENT.logo.wordmark || { x: [0, NW], y: [0, NH] };
+    const wmTop = WM.y[0] * LK, wmBot = WM.y[1] * LK, wmCx = (WM.x[0] + WM.x[1]) / 2 * LK;
+    const LX = LOGO5.cx - LW / 2, LT = LOGO5.cy - (wmBot - wmTop + LY.slogan.gap) / 2 - wmTop;
+    const defs = mk('defs', svg, {});
+    const logoMask = mk('mask', defs, { id: 'logoMask', maskUnits: 'userSpaceOnUse', maskContentUnits: 'userSpaceOnUse',
+                                        x: -20, y: -20, width: LW + 40, height: LH + 40, style: 'mask-type:alpha' });
+    mk('image', logoMask, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH });
+    const GL = mk('g', svg, { class: 'logo' });
+    mk('image', GL, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH, class: 'logo-img' });
+    mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, class: 'logo-ink', mask: 'url(#logoMask)' });
     // 라이트 확산 때 로고 위를 지나가는 빛
-    const sweepGrad = mk('linearGradient', mk('defs', svg, {}), { id: 'sweep', gradientUnits: 'userSpaceOnUse', x1: 0, x2: 260, y1: 0, y2: 0 });
+    const SWEEP_W = 250;
+    const sweepGrad = mk('linearGradient', defs, { id: 'sweep', gradientUnits: 'userSpaceOnUse', x1: 0, x2: SWEEP_W, y1: 0, y2: 0 });
     [['0', 0], ['.5', .9], ['1', 0]].forEach(([o, a]) => mk('stop', sweepGrad, { offset: o, 'stop-color': '#ffffff', 'stop-opacity': a }));
-    const GLs = mk('g', GL, { class: 'logo-sweep' });
-    LOGO_LETTERS.forEach(([x, d]) => mk('path', GLs, { d, transform: `translate(${x} 0)`, 'clip-path': 'url(#logoCap)' }));
-    const slogan = mk('text', svg, { x: LY.slogan.x, y: LY.slogan.y, class: 'slogan', 'text-anchor': 'middle' });
+    const GLs = mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, fill: 'url(#sweep)', mask: 'url(#logoMask)' });
+    const slogan = mk('text', svg, { x: LX + wmCx, y: LT + wmBot + LY.slogan.gap, class: 'slogan', 'text-anchor': 'middle' });
     slogan.style.fontSize = LY.slogan.size + 'px';
     slogan.textContent = CONTENT.slogan;
     const drawLogo = s => {
-      // 글자가 가운데로 모여들며 자리 잡음 (바깥 글자일수록 멀리서, 조금 늦게)
-      letterEls.forEach((el, i) => {
-        const off = (i - (letterEls.length - 1) / 2), k = E.out(clamp(s.logo * 1.25 - Math.abs(off) * .05));
-        const x = +el.dataset.x + off * 46 * (1 - k);
-        el.setAttribute('transform', `translate(${x.toFixed(2)} ${(18 * (1 - k)).toFixed(2)})`);
-        el.setAttribute('opacity', k.toFixed(3));
-      });
-      GL.setAttribute('opacity', s.logo > 0 ? 1 : 0);
-      const sw = s.sweep, sx = -300 + sw * (LOGO_W + 600);
-      sweepGrad.setAttribute('x1', sx); sweepGrad.setAttribute('x2', sx + 260);
+      // 로고가 살짝 크게 떠 있다가 제자리로 모여들며 자리 잡음
+      const k = E.out(clamp(s.logo * 1.15)), sc = 1 + .06 * (1 - k);
+      GL.setAttribute('transform', `translate(${LX + LW / 2} ${(LT + LH / 2 + 18 * (1 - k)).toFixed(2)}) scale(${sc.toFixed(4)}) translate(${-LW / 2} ${-LH / 2})`);
+      GL.setAttribute('opacity', k.toFixed(3));
+      const sw = s.sweep, sx = -SWEEP_W + sw * (LW + SWEEP_W * 2);
+      sweepGrad.setAttribute('x1', sx); sweepGrad.setAttribute('x2', sx + SWEEP_W);
       GLs.setAttribute('opacity', (Math.sin(Math.PI * sw) * (isDark() ? .9 : .55)).toFixed(3));
       slogan.setAttribute('opacity', s.slogan.toFixed(3));
       const [ls0, ls1] = LY.slogan.ls;
@@ -816,11 +822,11 @@
   // 화면 비율이 PORTRAIT_BELOW 보다 좁으면 세로 구도(9:16), 아니면 가로 구도(16:9)
   const PORTRAIT_BELOW = .8;
   const pickLayout = () => (innerWidth / innerHeight < PORTRAIT_BELOW ? 'port' : 'land');
-  let scene = null, sceneKey = '', lastT = FROM;
+  let scene = null, sceneKey = '', lastT = FROM, logoSize = [370, 71];   // logoSize: 로고 SVG 의 원래 크기 (읽으면 실제 값으로 바뀜)
   const render = t => { scene.render(t); lastT = t; };
   const fit = () => {
     const k = pickLayout();
-    if (k !== sceneKey) { sceneKey = k; scene = buildScene(LAYOUTS[k]); }
+    if (k !== sceneKey) { sceneKey = k; scene = buildScene(LAYOUTS[k], k); }
     scene.resize();
   };
 
@@ -836,23 +842,33 @@
     dispatchEvent(new CustomEvent('intro:end', { detail: { skipped } }));
   };
 
-  fit();
-  addEventListener('resize', () => { fit(); render(lastT); });
-  window.renderAt = t => { render(t); return true; };
-  window.__ready = Promise.resolve();
+  // 로고 SVG 를 먼저 읽어 가로세로 비율을 알아낸 뒤 시작 (캡처 스크립트는 window.__ready 를 기다림)
+  const boot = () => {
+    fit();
+    addEventListener('resize', () => { fit(); render(lastT); });
+    window.renderAt = t => { render(t); return true; };
 
-  const fixed = q.get('t');
-  if (fixed !== null) { document.body.classList.add('hide-ui'); render(parseFloat(fixed) || 0); return; }
+    const fixed = q.get('t');
+    if (fixed !== null) { document.body.classList.add('hide-ui'); render(parseFloat(fixed) || 0); return; }
 
-  const loop = now => {
-    if (done) return;
-    const t = FROM + (now - t0) / 1000;
-    if (t >= TO) { finish(false); return; }
-    render(t);
+    const loop = now => {
+      if (done) return;
+      const t = FROM + (now - t0) / 1000;
+      if (t >= TO) { finish(false); return; }
+      render(t);
+      requestAnimationFrame(loop);
+    };
+    t0 = performance.now();
     requestAnimationFrame(loop);
+    skipBtn.onclick = () => finish(true);
+    document.getElementById('theme').onclick = () => { setTheme(isDark() ? 'light' : 'dark'); render(lastT); };
   };
-  t0 = performance.now();
-  requestAnimationFrame(loop);
-  skipBtn.onclick = () => finish(true);
-  document.getElementById('theme').onclick = () => { setTheme(isDark() ? 'light' : 'dark'); render(lastT); };
+  const logoImg = new Image();
+  window.__ready = new Promise(res => { logoImg.onload = logoImg.onerror = res; logoImg.src = CONTENT.logo.src; })
+    .then(() => logoImg.decode().catch(() => {}))
+    .then(() => {
+      if (logoImg.naturalWidth && logoImg.naturalHeight) logoSize = [logoImg.naturalWidth, logoImg.naturalHeight];
+      else console.warn('logo: 크기를 읽지 못해 기본 크기 사용', CONTENT.logo.src);
+      boot();
+    });
 })();

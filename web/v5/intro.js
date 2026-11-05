@@ -108,9 +108,9 @@
       TC: [960, 543], TR: 318,
       C5: { x: 205, y: 1066, r: 422 }, R5: { x: 1404, y: 793, w: 600, h: 330, rx: 34 },
       ARC5: { x: 1856, y: -41, r: 495 }, DOT5: { x: 122, y: 321, r: 14 },
-      LOGO5: { cx: 960, cy: 541 },                           // 로고 전체의 가로 중심 / (글자 윗변 ~ 슬로건) 덩어리의 세로 중심. 크기는 content.js
-      slogan: { gap: 80, size: 30, ls: [10, 5] },            // gap: 글자 아랫변 → 슬로건 기준선, ls: 등장 전 → 정지 시 자간
-      blobs: [[1720, 1120, 620, .85], [1880, 40, 520, .45], [80, 980, 520, .3]],   // 배경 연한 빛 면
+      LOGO5: { cx: 960, cy: 541 },
+      slogan: { gap: 80, size: 30, ls: [10, 5] },
+      blobs: [[1720, 1120, 620, .85], [1880, 40, 520, .45], [80, 980, 520, .3]],
       flare: [960, 541], flareR: [700, 300], bloomR: [520, 260],
       lines: [
         { // 01 IDEA
@@ -145,9 +145,6 @@
       ],
     },
   };
-  // 세로: 가운데 가로선 y=900. 01·02 는 같은 선 위의 가로 이동, 03 은 원(위)·사각형(오른쪽 아래)이 대각선으로 겹침,
-  //       04 는 화면 가운데 구, 05 는 로고 아래 왼쪽 아래 원 · 오른쪽 아래 사각형 · 오른쪽 위 원호.
-  //       폰(≈9:19.5)에서는 x 80~1000 정도가 보이므로 주요 요소는 그 안에 둔다.
   LAYOUTS.port = {
     W: 1080, H: 1920, safe: [920, 1300],
     tracks: {
@@ -165,7 +162,6 @@
     C5: { x: 150, y: 1780, r: 400 }, R5: { x: 690, y: 1560, w: 520, h: 400, rx: 34 },
     ARC5: { x: 1040, y: -20, r: 420 }, DOT5: { x: 140, y: 470, r: 14 },
     LOGO5: { cx: 540, cy: 900 },
-    // 세로: 슬로건이 로고 폭의 ~90%쯤 되게(가로 구도의 자간 비율보다 약간 타이트)
     slogan: { gap: 90, size: 40, ls: [10, 5] },
     blobs: [[960, 1950, 600, .85], [1060, 60, 480, .45], [60, 1500, 480, .3]],
     flare: [540, 900], flareR: [600, 260], bloomR: [460, 230],
@@ -750,8 +746,6 @@
             ...(d.hollows || []).map(([x, y, z]) => mk('rect', g, { x: x - z / 2, y: y - z / 2, width: z, height: z, class: 'hollow' }))],
     });
     const S1 = build(G1, L1), S2 = build(G2, L2), S3 = build(G3, L3), S4 = build(G4, L4);
-    // 05 로고 · 슬로건: 내용은 content.js (INTRO_CONTENT)
-    // 라이트: 마스크 + 파란 gradient. 다크: 마스크 + --ink (기존). 마크 로고는 wordmark 기준 정렬.
     const [NW, NH] = logoSize, LW = CONTENT.logo.width[key], LK = LW / NW, LH = NH * LK;
     const WM = CONTENT.logo.wordmark || { x: [0, NW], y: [0, NH] };
     const wmTop = WM.y[0] * LK, wmBot = WM.y[1] * LK, wmCx = (WM.x[0] + WM.x[1]) / 2 * LK;
@@ -760,17 +754,17 @@
     const logoMask = mk('mask', defs, { id: 'logoMask', maskUnits: 'userSpaceOnUse', maskContentUnits: 'userSpaceOnUse',
                                         x: -20, y: -20, width: LW + 40, height: LH + 40, style: 'mask-type:alpha' });
     mk('image', logoMask, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH });
-    const logoStops = CONTENT.logo.gradient || ['#0034d6', '#0a56fc', '#4f88fb'];
+    const gCfg = CONTENT.logo.gradient || {};
+    const lightStops = Array.isArray(gCfg) ? gCfg : (gCfg.light || ['#0034d6', '#0a56fc', '#4f88fb']);
     const logoGrad = mk('linearGradient', defs, { id: 'logoGrad', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 0, x2: LW, y2: LH * .35 });
-    logoStops.forEach((c, i) => mk('stop', logoGrad, {
-      offset: String(logoStops.length < 2 ? 0 : i / (logoStops.length - 1)),
+    lightStops.forEach((c, i) => mk('stop', logoGrad, {
+      offset: String(lightStops.length < 2 ? 0 : i / (lightStops.length - 1)),
       'stop-color': c,
     }));
     const GL = mk('g', svg, { class: 'logo' });
     mk('image', GL, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH, class: 'logo-img' });
     mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, class: 'logo-fill', fill: 'url(#logoGrad)', mask: 'url(#logoMask)' });
     mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, class: 'logo-ink', mask: 'url(#logoMask)' });
-    // 라이트 확산 때 로고 위를 지나가는 빛
     const SWEEP_W = 250;
     const sweepGrad = mk('linearGradient', defs, { id: 'sweep', gradientUnits: 'userSpaceOnUse', x1: 0, x2: SWEEP_W, y1: 0, y2: 0 });
     [['0', 0], ['.5', .9], ['1', 0]].forEach(([o, a]) => mk('stop', sweepGrad, { offset: o, 'stop-color': '#ffffff', 'stop-opacity': a }));
@@ -779,7 +773,6 @@
     slogan.style.fontSize = LY.slogan.size + 'px';
     slogan.textContent = CONTENT.slogan;
     const drawLogo = s => {
-      // 로고가 살짝 크게 떠 있다가 제자리로 모여들며 자리 잡음
       const k = E.out(clamp(s.logo * 1.15)), sc = 1 + .06 * (1 - k);
       GL.setAttribute('transform', `translate(${LX + LW / 2} ${(LT + LH / 2 + 18 * (1 - k)).toFixed(2)}) scale(${sc.toFixed(4)}) translate(${-LW / 2} ${-LH / 2})`);
       GL.setAttribute('opacity', k.toFixed(3));

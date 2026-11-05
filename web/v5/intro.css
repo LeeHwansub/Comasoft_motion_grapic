@@ -33,16 +33,23 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
 }
 :root[data-theme="dark"] #lines .logo { filter: drop-shadow(0 0 18px rgba(80, 130, 255, .35)); }
 
-.review {
-  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-  display: flex; gap: 12px; align-items: center;
+/* 화면 버튼: 테마(오른쪽 위) · Skip(가운데 아래). 노치·홈 바(safe-area)를 피해 배치 */
+.ui {
+  position: fixed; z-index: 1;
   font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ui);
-  width: min(720px, calc(100% - 32px));
+  background: none; border: 1px solid currentColor; border-radius: 999px;
+  padding: 10px 16px; cursor: pointer; white-space: nowrap;
+  transition: opacity .4s;
 }
-.review button {
-  font: inherit; color: inherit; background: none; border: 1px solid currentColor;
-  border-radius: 999px; padding: 6px 10px; cursor: pointer; white-space: nowrap;
+.ui:hover, .ui:focus-visible { color: var(--ink); }
+.theme {
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
 }
-.review input { flex: 1; accent-color: #1f5bff; }
-.review output { min-width: 72px; text-align: right; }
-.hide-ui .review { display: none; }
+.skip {
+  left: 50%; transform: translateX(-50%);
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.skip.done { opacity: 0; pointer-events: none; }
+.hide-ui .ui { display: none; }

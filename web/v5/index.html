@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>COMASOFT Intro v5</title>
 <link rel="stylesheet" href="intro.css">
 </head>
@@ -13,13 +13,10 @@
   <svg id="lines" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
 </section>
 
-<!-- 검토용 컨트롤 (?t= 로 고정 프레임을 볼 때는 숨김) -->
-<div class="review" id="review">
-  <button id="play" type="button" aria-label="재생/정지">❚❚</button>
-  <input id="scrub" type="range" min="0" max="5" step="0.01" value="0" aria-label="타임라인">
-  <output id="tc">00:00.00</output>
-  <button id="theme" type="button">Light / Dark</button>
-</div>
+<!-- 화면 버튼 (?t= 로 고정 프레임을 볼 때 · 영상 캡처 때는 숨김) -->
+<button class="ui theme" id="theme" type="button">Light / Dark</button>
+<button class="ui skip" id="skip" type="button">Skip</button>
+<script src="content.js"></script>
 <script src="intro.js"></script>
 </body>
 </html>

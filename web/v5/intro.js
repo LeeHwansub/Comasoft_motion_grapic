@@ -751,8 +751,7 @@
     });
     const S1 = build(G1, L1), S2 = build(G2, L2), S3 = build(G3, L3), S4 = build(G4, L4);
     // 05 로고 · 슬로건: 내용은 content.js (INTRO_CONTENT)
-    // 로고는 SVG 파일을 그대로 그린다(라이트). 다크에서는 같은 모양을 마스크로 써서 --ink 색으로 칠한다.
-    // 마크가 붙은 로고: 슬로건은 글자(wordmark) 가운데에, (글자 윗변 ~ 슬로건 기준선) 덩어리는 LOGO5.cy 에 맞춤
+    // 라이트: 마스크 + 파란 gradient. 다크: 마스크 + --ink (기존). 마크 로고는 wordmark 기준 정렬.
     const [NW, NH] = logoSize, LW = CONTENT.logo.width[key], LK = LW / NW, LH = NH * LK;
     const WM = CONTENT.logo.wordmark || { x: [0, NW], y: [0, NH] };
     const wmTop = WM.y[0] * LK, wmBot = WM.y[1] * LK, wmCx = (WM.x[0] + WM.x[1]) / 2 * LK;
@@ -761,8 +760,15 @@
     const logoMask = mk('mask', defs, { id: 'logoMask', maskUnits: 'userSpaceOnUse', maskContentUnits: 'userSpaceOnUse',
                                         x: -20, y: -20, width: LW + 40, height: LH + 40, style: 'mask-type:alpha' });
     mk('image', logoMask, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH });
+    const logoStops = CONTENT.logo.gradient || ['#0034d6', '#0a56fc', '#4f88fb'];
+    const logoGrad = mk('linearGradient', defs, { id: 'logoGrad', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 0, x2: LW, y2: LH * .35 });
+    logoStops.forEach((c, i) => mk('stop', logoGrad, {
+      offset: String(logoStops.length < 2 ? 0 : i / (logoStops.length - 1)),
+      'stop-color': c,
+    }));
     const GL = mk('g', svg, { class: 'logo' });
     mk('image', GL, { href: CONTENT.logo.src, x: 0, y: 0, width: LW, height: LH, class: 'logo-img' });
+    mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, class: 'logo-fill', fill: 'url(#logoGrad)', mask: 'url(#logoMask)' });
     mk('rect', GL, { x: 0, y: 0, width: LW, height: LH, class: 'logo-ink', mask: 'url(#logoMask)' });
     // 라이트 확산 때 로고 위를 지나가는 빛
     const SWEEP_W = 250;

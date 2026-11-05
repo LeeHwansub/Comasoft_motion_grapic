@@ -15,5 +15,7 @@ window.INTRO_CONTENT = {
     src: 'logo-comasoft.svg',
     width: { land: 900, port: 640 },
     wordmark: { x: [55, 370], y: [31.5, 71] },
+    // 라이트만: 인트로 파란 톤 그라데이션. 다크는 --ink 유지.
+    gradient: ['#0034d6', '#0a56fc', '#4f88fb'],
   },
 };

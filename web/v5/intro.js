@@ -409,6 +409,8 @@
       // cover 로 채우되, 안전영역(로고·슬로건)은 잘리지 않을 만큼만 확대
       const s = Math.min(Math.max(vw / W, vh / H), vw / LY.safe[0], vh / LY.safe[1]);
       view = { s, ox: (vw - W * s) / 2, oy: (vh - H * s) / 2 };
+      // SVG(선·로고)도 canvas 와 같은 영역을 보이게: 화면 비율과 같은 viewBox 라 slice 가 배율을 바꾸지 않음
+      svg.setAttribute('viewBox', [-view.ox / s, -view.oy / s, vw / s, vh / s].map(v => v.toFixed(3)).join(' '));
     }
     const toDesign = c => c.setTransform(dpr * view.s, 0, 0, dpr * view.s, dpr * view.ox, dpr * view.oy);
     const poly = (c, pts) => { c.beginPath(); pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); };

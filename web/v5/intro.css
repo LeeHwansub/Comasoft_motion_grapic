@@ -5,7 +5,7 @@
   --line: rgba(31, 91, 255, .32);
   --guide: rgba(31, 91, 255, .22);
   --dot: #1f5bff;
-  --ui: rgba(11, 13, 18, .55);
+  --ui: rgba(11, 13, 18, .62);   /* 배경 #f7f9fe 위 대비 약 5.4:1 (WCAG AA 4.5:1 이상) */
 }
 :root[data-theme="dark"] {
   --bg: #0a090a;
@@ -56,7 +56,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
   bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
   letter-spacing: .12em; text-transform: uppercase;
 }
-.skip.done { opacity: 0; pointer-events: none; }
+/* 페이드가 끝나면 visibility 로 완전히 숨겨 Tab 순서·스크린리더에서도 빠지게 */
+.skip.done { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity .4s, visibility 0s .4s; }
 .hide-ui .ui { display: none; }
 
 @media (min-width: 769px) {

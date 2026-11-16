@@ -852,6 +852,11 @@
     const fixed = q.get('t');
     if (fixed !== null) { document.body.classList.add('hide-ui'); render(parseFloat(fixed) || 0); return; }
 
+    skipBtn.onclick = () => finish(true);
+    document.getElementById('theme').onclick = () => { setTheme(isDark() ? 'light' : 'dark'); render(lastT); };
+    // OS 에서 '동작 줄이기'를 켠 경우: 재생 없이 최종 화면을 바로 보여 줌
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(false); return; }
+
     const loop = now => {
       if (done) return;
       const t = FROM + (now - t0) / 1000;
@@ -861,12 +866,15 @@
     };
     t0 = performance.now();
     requestAnimationFrame(loop);
-    skipBtn.onclick = () => finish(true);
-    document.getElementById('theme').onclick = () => { setTheme(isDark() ? 'light' : 'dark'); render(lastT); };
   };
   const logoImg = new Image();
+  // 슬로건 폰트(Pretendard 600)를 받은 뒤 시작해 재생 중 글꼴이 바뀌지 않게. 느리거나 실패하면 1.5초 뒤 대체 폰트로 진행
+  const fontReady = Promise.race([
+    document.fonts.load('600 30px "Pretendard"', CONTENT.slogan).catch(() => {}),
+    new Promise(res => setTimeout(res, 1500)),
+  ]);
   window.__ready = new Promise(res => { logoImg.onload = logoImg.onerror = res; logoImg.src = CONTENT.logo.src; })
-    .then(() => logoImg.decode().catch(() => {}))
+    .then(() => Promise.all([logoImg.decode().catch(() => {}), fontReady]))
     .then(() => {
       if (logoImg.naturalWidth && logoImg.naturalHeight) logoSize = [logoImg.naturalWidth, logoImg.naturalHeight];
       else console.warn('logo: 크기를 읽지 못해 기본 크기 사용', CONTENT.logo.src);

@@ -1,5 +1,5 @@
 window.INTRO_CONTENT = {
-  slogan: 'AI로 열어가는 새로운 가능성.',
+  slogan: 'AI로 열어가는 새로운 가능성',
   logo: {
     src: 'logo-comasoft.svg',
     width: { land: 900, port: 640 },

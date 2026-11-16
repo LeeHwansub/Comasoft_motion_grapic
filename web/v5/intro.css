@@ -1,14 +1,17 @@
 :root {
   --bg: #f7f9fe;
   --ink: #0b0d12;
+  --slogan: #3d5fbf;
   --line: rgba(31, 91, 255, .32);
   --guide: rgba(31, 91, 255, .22);
   --dot: #1f5bff;
-  --ui: rgba(11, 13, 18, .55);
+  --ui: rgba(11, 13, 18, .62);   /* 배경 #f7f9fe 위 대비 약 5.4:1 (WCAG AA 4.5:1 이상) */
 }
 :root[data-theme="dark"] {
   --bg: #0a090a;
   --ink: #ffffff;
+  --logo: #e2e8f6;
+  --slogan: rgba(175, 195, 240, .62);
   --line: rgba(110, 150, 255, .34);
   --guide: rgba(110, 150, 255, .2);
   --dot: #3d7bff;
@@ -25,24 +28,48 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
 #lines .ink { fill: var(--ink); }
 #lines .hollow { fill: none; stroke: var(--dot); stroke-width: 3; }
 
-#lines .logo path { fill: none; stroke: var(--ink); stroke-width: 19; stroke-linejoin: miter; stroke-miterlimit: 10; }
-#lines .logo-sweep path { stroke: url(#sweep); }
+#lines .logo-img { display: none; }
+#lines .logo-fill { display: inline; }
+#lines .logo-ink { display: none; }
+:root[data-theme="dark"] #lines .logo-fill { display: none; }
+:root[data-theme="dark"] #lines .logo-ink { display: inline; fill: var(--logo); }
 #lines .slogan {
   font: 600 19px/1 "Pretendard", "Inter", "Helvetica Neue", Arial, sans-serif;
-  fill: var(--ink);
+  fill: var(--slogan);
 }
-:root[data-theme="dark"] #lines .logo { filter: drop-shadow(0 0 18px rgba(80, 130, 255, .35)); }
+:root[data-theme="dark"] #lines .logo { filter: drop-shadow(0 0 14px rgba(80, 130, 255, .2)); }
 
-.review {
-  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-  display: flex; gap: 12px; align-items: center;
+.ui {
+  position: fixed; z-index: 1;
   font: 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ui);
-  width: min(720px, calc(100% - 32px));
+  background: none; border: 1px solid currentColor; border-radius: 999px;
+  padding: 10px 16px; cursor: pointer; white-space: nowrap;
+  transition: opacity .4s;
 }
-.review button {
-  font: inherit; color: inherit; background: none; border: 1px solid currentColor;
-  border-radius: 999px; padding: 6px 10px; cursor: pointer; white-space: nowrap;
+.ui:hover, .ui:focus-visible { color: var(--ink); }
+.theme {
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
 }
-.review input { flex: 1; accent-color: #1f5bff; }
-.review output { min-width: 72px; text-align: right; }
-.hide-ui .review { display: none; }
+.skip {
+  left: 50%; transform: translateX(-50%);
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+  letter-spacing: .12em; text-transform: uppercase;
+}
+/* 페이드가 끝나면 visibility 로 완전히 숨겨 Tab 순서·스크린리더에서도 빠지게 */
+.skip.done { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity .4s, visibility 0s .4s; }
+.hide-ui .ui { display: none; }
+
+@media (min-width: 769px) {
+  .skip {
+    font-size: 15px; padding: 14px 34px; bottom: 40px;
+    color: var(--ink); border-width: 1.5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ui {
+    font-size: 10px;
+    padding: 7px 12px;
+  }
+}
